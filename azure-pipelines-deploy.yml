@@ -1,4 +1,3 @@
-
 trigger: none
 
 pool:
@@ -20,9 +19,10 @@ stages:
       inputs:
         sshEndpoint: '$(sshConnection)'
         runOptions: 'inline'
+        failOnStdErr: false
         inline: |
           echo "=== 1. Deteniendo y eliminando contenedor previo si existe ==="
-          sudo docker rm -f $(containerName) || true
+          sudo docker rm -f $(containerName) 2>/dev/null || true
 
           echo "=== 2. Iniciando nuevo contenedor web ==="
           sudo docker run -d \
