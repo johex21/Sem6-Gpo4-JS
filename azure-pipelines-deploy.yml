@@ -1,0 +1,38 @@
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  sshConnection: 'sc-vm-docker'
+  imageName: 'app-web-duoc:latest'
+  containerName: 'contenedor-web-eval2'
+
+stages:
+- stage: DeployStage
+  displayName: 'Stage Deployment VM'
+  jobs:
+  - job: SSHDeployJob
+    displayName: 'Despliegue de Contenedor en VM Linux'
+    steps:
+    - task: SSH@0
+      displayName: 'Ejecutar despliegue Docker en host remoto'
+      inputs:
+        sshEndpoint: '$(sshConnection)'
+        runOptions: 'inline'
+        inline: |
+          echo "=== 1. Deteniendo contenedor previo si existe ==="
+          if [ \((sudo docker ps -a -q -f name=\)(containerName)) ]; then
+              sudo docker stop $(containerName)
+              sudo docker rm $(containerName)
+          fi
+
+          echo "=== 2. Iniciando nuevo contenedor ==="
+          sudo docker run -d \
+            --name $(containerName) \
+            -p 80:80 \
+            --restart always \
+            nginx:alpine
+
+          echo "=== 3. Estado del contenedor ==="
+          sudo docker ps -f name=$(containerName)
