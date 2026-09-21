@@ -5,6 +5,8 @@ pool:
 
 variables:
   sshConnection: 'sc-vm-docker'
+  acrServer: 'acrsem6g4js26741.azurecr.io'
+  imageName: 'app-web-duoc:latest'
   containerName: 'contenedor-web-eval2'
 
 stages:
