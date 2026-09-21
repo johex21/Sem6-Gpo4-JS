@@ -1,3 +1,4 @@
+
 trigger: none
 
 pool:
@@ -5,7 +6,6 @@ pool:
 
 variables:
   sshConnection: 'sc-vm-docker'
-  imageName: 'app-web-duoc:latest'
   containerName: 'contenedor-web-eval2'
 
 stages:
@@ -21,18 +21,15 @@ stages:
         sshEndpoint: '$(sshConnection)'
         runOptions: 'inline'
         inline: |
-          echo "=== 1. Deteniendo contenedor previo si existe ==="
-          if [ \((sudo docker ps -a -q -f name=\)(containerName)) ]; then
-              sudo docker stop $(containerName)
-              sudo docker rm $(containerName)
-          fi
+          echo "=== 1. Deteniendo y eliminando contenedor previo si existe ==="
+          sudo docker rm -f $(containerName) || true
 
-          echo "=== 2. Iniciando nuevo contenedor ==="
+          echo "=== 2. Iniciando nuevo contenedor web ==="
           sudo docker run -d \
             --name $(containerName) \
             -p 80:80 \
             --restart always \
             nginx:alpine
 
-          echo "=== 3. Estado del contenedor ==="
+          echo "=== 3. Comprobacion de estado del contenedor ==="
           sudo docker ps -f name=$(containerName)
